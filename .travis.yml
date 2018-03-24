@@ -1,0 +1,29 @@
+language: php
+
+php:
+ - 7.0
+
+env:
+  global:
+    - PROTOC_VERSION=3.0.0
+
+cache:
+  directories:
+    ${HOME}/protoc
+
+install:
+ - composer install
+ - if [ ! -e "${HOME}/protoc" ]; then
+     mkdir ${HOME}/protoc;
+   fi
+ - if [ ! -e "${HOME}/protoc/protoc-${PROTOC_VERSION}" ]; then
+     mkdir $HOME/protoc/protoc-$PROTOC_VERSION &&
+     wget https://github.com/google/protobuf/releases/download/v3.0.0/protoc-$PROTOC_VERSION-linux-x86_64.zip &&
+     unzip protoc-$PROTOC_VERSION-linux-x86_64.zip -d $HOME/protoc/protoc-$PROTOC_VERSION;
+   fi
+ - echo "export PATH=$PATH:$HOME/protoc/protoc-$PROTOC_VERSION/bin" > ~/.bashrc
+ - source ~/.bashrc
+
+script:
+ - make check-src
+ - vendor/bin/phpunit
